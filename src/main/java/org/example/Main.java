@@ -20,33 +20,31 @@ public class Main {
                 try (Socket clientSocket = serverSocket.accept();
                      PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                      BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
-                    while (true) {
-                        count++;
-                        out.println(actualCity);
-                        String city = in.readLine();
-                        if (city.equals("end")) {
-                            break;
-                        }
-                        if (count == 1) {
+                    count++;
+                    serverSocket.setSoTimeout(30000);
+                    out.println(actualCity);
+                    String city = in.readLine();
+                    if (city.equals("end")) {
+                        out.println("Конец игры");
+                        break;
+                    }
+                    if (count == 1) {
+                        actualCity = city;
+                        out.println("OK");
+                    }
+                    if (count > 1) {
+                        if (city.charAt(0) == actualCity.charAt(actualCity.length() - 1)) {
                             actualCity = city;
                             out.println("OK");
-                        }
-                        if (count > 1) {
-                            if (city.charAt(0) == actualCity.charAt(actualCity.length() - 1)) {
-                                actualCity = city;
-                                out.println("OK");
-                            } else {
-                                out.println("NOT OK");
-                                continue;
-                            }
+                        } else {
+                            out.println("NOT OK");
                         }
                     }
-                    out.println("end");
-                    break;
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Не могу стартовать сервер");
+            e.printStackTrace();
         }
     }
 
